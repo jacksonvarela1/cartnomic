@@ -4,6 +4,7 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import './styles.css'
 import { AppProvider } from './state/store'
 import Shell from './components/Shell'
+import ChunkBoundary from './components/ChunkBoundary'
 import BasketPage from './routes/BasketPage'
 import ComparePage from './routes/ComparePage'
 import PreferencesPage from './routes/PreferencesPage'
@@ -23,7 +24,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/basket" element={<BasketPage />} />
             <Route path="/compare" element={<ComparePage />} />
             <Route path="/preferences" element={<PreferencesPage />} />
-            <Route path="/trends" element={<Suspense fallback={<p className="muted">Loading the charts.</p>}><TrendsPage /></Suspense>} />
+            <Route path="/trends" element={<ChunkBoundary><Suspense fallback={<p className="muted">Loading the charts.</p>}><TrendsPage /></Suspense></ChunkBoundary>} />
             <Route path="/plan" element={<PlanPage />} />
             <Route path="/sources" element={<SourcesPage />} />
             <Route path="*" element={<Navigate to="/basket" replace />} />

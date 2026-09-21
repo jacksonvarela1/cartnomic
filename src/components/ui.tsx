@@ -1,5 +1,5 @@
-import { AlertTriangle, CheckCircle2, CircleHelp, Info, XCircle } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { AlertTriangle, CheckCircle2, CircleHelp, Info, Inbox, XCircle, type LucideIcon } from 'lucide-react'
+import { useState, type ReactNode } from 'react'
 import type { DietAssessment, DietStatus } from '../domain/diet'
 import { STATUS_LABEL } from '../domain/diet'
 
@@ -9,6 +9,57 @@ export function Banner({ tone, children }: { tone: 'demo' | 'info' | 'danger' | 
     <div className={'banner ' + tone} role={tone === 'danger' ? 'alert' : undefined}>
       <Icon size={18} aria-hidden="true" />
       <div>{children}</div>
+    </div>
+  )
+}
+
+/** A small question mark that explains a term in place. Every piece of jargon in the app has one. */
+export function InfoTip({ term, children }: { term: string; children: ReactNode }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <span className="infotip">
+      <button
+        type="button"
+        className="infotip-btn"
+        aria-expanded={open}
+        aria-label={open ? 'Hide the explanation of ' + term : 'What does ' + term + ' mean?'}
+        onClick={() => setOpen(!open)}
+      >
+        ?
+      </button>
+      {open ? <span className="infotip-body" role="note">{children}</span> : null}
+    </span>
+  )
+}
+
+export interface IntroPoint {
+  icon: LucideIcon
+  title: string
+  text: string
+}
+
+/** Every page opens the same way: where you are, what this screen is for, what you do and get. */
+export function PageIntro({
+  eyebrow, title, lead, points,
+}: { eyebrow: string; title: string; lead: string; points?: IntroPoint[] }) {
+  return (
+    <div className="page-head">
+      <span className="eyebrow">{eyebrow}</span>
+      <h1>{title}</h1>
+      <p className="sub">{lead}</p>
+      {points && points.length > 0 ? (
+        <div className="intro-points">
+          {points.map((point) => (
+            <div key={point.title} className="intro-point">
+              <span className="ip-icon"><point.icon size={17} aria-hidden="true" /></span>
+              <span>
+                <span className="ip-title">{point.title}</span>
+                <span className="ip-text" style={{ display: 'block' }}>{point.text}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -28,7 +79,7 @@ export function StatusPill({ status }: { status: DietStatus }) {
 export function WhyPanel({ assessment, summary }: { assessment: DietAssessment; summary?: string }) {
   return (
     <details>
-      <summary>{summary ?? 'Why?'}</summary>
+      <summary>{summary ?? 'Why this verdict?'}</summary>
       <div className="details-body">
         {assessment.preferenceGuideNote ? <Banner tone="info">{assessment.preferenceGuideNote}</Banner> : null}
         {assessment.rules.length === 0 ? (
@@ -53,7 +104,6 @@ export function WhyPanel({ assessment, summary }: { assessment: DietAssessment; 
             <div className="row"><dt style={{ minWidth: 110 }}>Source date</dt><dd style={{ margin: 0 }}>{assessment.sourceDate}</dd></div>
           ) : null}
           <div className="row"><dt style={{ minWidth: 110 }}>Rule version</dt><dd style={{ margin: 0 }}>{assessment.ruleVersion}</dd></div>
-          <div className="row"><dt style={{ minWidth: 110 }}>Evaluated</dt><dd style={{ margin: 0 }}>{assessment.evaluatedAt}</dd></div>
           {assessment.unresolvedFields.length > 0 ? (
             <div className="row"><dt style={{ minWidth: 110 }}>Unresolved</dt><dd style={{ margin: 0 }}>{assessment.unresolvedFields.join(' ')}</dd></div>
           ) : null}
@@ -77,9 +127,10 @@ export function Field({
   )
 }
 
-export function EmptyState({ title, children }: { title: string; children?: ReactNode }) {
+export function EmptyState({ title, icon: Icon = Inbox, children }: { title: string; icon?: LucideIcon; children?: ReactNode }) {
   return (
     <div className="empty">
+      <span className="empty-icon"><Icon size={22} aria-hidden="true" /></span>
       <strong>{title}</strong>
       {children}
     </div>

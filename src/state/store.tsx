@@ -36,6 +36,7 @@ export interface PersistedState {
   userProducts: Product[]
   userObservations: PriceObservation[]
   customProducts: Record<DataMode, Product[]>
+  welcomeDismissed: boolean
 }
 
 function freshState(): PersistedState {
@@ -52,6 +53,7 @@ function freshState(): PersistedState {
     userProducts: [],
     userObservations: [],
     customProducts: { demo: [], verified: [] },
+    welcomeDismissed: false,
   }
 }
 
@@ -96,6 +98,7 @@ export interface AppContextValue {
   clearChecked: () => void
   addImported: (payload: { stores?: Store[]; products?: Product[]; observations?: PriceObservation[] }) => void
   addCustomProduct: (name: string) => string
+  dismissWelcome: () => void
   resetAll: () => void
   loadDemoBasket: () => void
 }
@@ -237,6 +240,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setState((s) => ({ ...s, customProducts: { ...s.customProducts, [s.dataMode]: [...(s.customProducts?.[s.dataMode] ?? []), custom] } }))
       return productId
     },
+    dismissWelcome: () => setState((s) => ({ ...s, welcomeDismissed: true })),
     resetAll: () => {
       try { window.localStorage.removeItem(STORAGE_KEY) } catch { /* storage may be blocked */ }
       setState(freshState())

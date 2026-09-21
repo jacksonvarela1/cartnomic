@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, X } from 'lucide-react'
+import { Eye, ListChecks, Plus, ShieldAlert, X } from 'lucide-react'
 import { useApp } from '../state/store'
 import { evidenceLibrary } from '../domain/catalog'
 import {
@@ -14,7 +14,7 @@ import {
   type NutritionTarget,
   type PatternId,
 } from '../domain/diet'
-import { Banner, Field, StatusPill, WhyPanel } from '../components/ui'
+import { Banner, Field, PageIntro, StatusPill, WhyPanel } from '../components/ui'
 
 const PATTERNS: PatternId[] = [
   'none', 'vegetarian', 'vegan', 'pescatarian', 'paleo', 'keto_low_carb', 'carnivore', 'mediterranean', 'flexitarian',
@@ -47,13 +47,16 @@ export default function PreferencesPage() {
 
   return (
     <>
-      <div className="page-head">
-        <h1>Your food. Your rules.</h1>
-        <p className="sub">
-          These are shopping rules, not medical advice and not an allergy guarantee. Every badge opens the evidence,
-          the source date and the rule version that produced it.
-        </p>
-      </div>
+      <PageIntro
+        eyebrow="Optional settings"
+        title="Your food. Your rules."
+        lead="Tell CartNomic what you will and will not buy. It checks each product against the actual ingredient list and shows the evidence behind every answer."
+        points={[
+          { icon: ListChecks, title: 'Three answers only', text: 'Matches, does not match, or unknown. Unknown never turns into a green check just to look tidy.' },
+          { icon: Eye, title: 'Always shows its work', text: 'Every badge opens the ingredient text, the source link and the date it was recorded.' },
+          { icon: ShieldAlert, title: 'Not medical advice', text: 'These are shopping filters. CartNomic cannot certify that anything is safe for an allergy.' },
+        ]}
+      />
 
       {dietConflicts.map((c) => <Banner key={c} tone="demo">{c}</Banner>)}
 
@@ -62,9 +65,10 @@ export default function PreferencesPage() {
           <h2>Baseline pattern</h2>
           <span className="caption">Rule version {RULE_VERSION}</span>
         </div>
-        <p className="small muted">
-          One baseline pattern plus your own exceptions. Selecting several patterns at once would produce a misleading
-          badge, so CartNomic does not offer it.
+        <p className="section-note">
+          <strong>Pick one pattern, then adjust it.</strong> Stacking several at once produces a badge that means
+          nothing, so CartNomic does not offer that. Everything below is an editable starting point, not a definition
+          anyone has to agree with.
         </p>
         <Field label="Dietary pattern" id="pattern">
           <select id="pattern" value={diet.pattern} onChange={(e) => setDiet((d) => ({ ...d, pattern: e.target.value as PatternId }))}>
@@ -239,9 +243,10 @@ export default function PreferencesPage() {
           <h2>Evidence library</h2>
           <span className="caption">{activeRuleCount} rule{activeRuleCount === 1 ? '' : 's'} active</span>
         </div>
-        <p className="small muted">
-          Real records from the two public sources in this project, evaluated live against the rules above. These are
-          nutrition and ingredient records, not local price evidence and not proof of current availability.
+        <p className="section-note">
+          <strong>This is the rule engine working on real products.</strong> Five genuine records, two manufacturer
+          labels and three USDA entries, checked against whatever you selected above, right now. Turn on Dairy free
+          and watch the yogurt fail on its milk ingredient. These are ingredient records, not local prices.
         </p>
         {evidenceLibrary.map((record) => {
           const verdict = assessProduct(record.recordId, record, diet, clockIso)

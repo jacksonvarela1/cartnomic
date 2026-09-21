@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { ClipboardCopy, Printer, RotateCcw } from 'lucide-react'
+import { ClipboardCopy, ListTodo, MapPin, Printer, RotateCcw } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../state/store'
 import { formatCents } from '../domain/money'
 import { UNIT_LABEL } from '../domain/units'
-import { Banner, EmptyState } from '../components/ui'
+import { Banner, EmptyState, PageIntro } from '../components/ui'
 
 export default function PlanPage() {
   const { comparison, stores, productsById, lines, state, toggleChecked, clearChecked, dataMode, clockIso } = useApp()
@@ -15,7 +15,11 @@ export default function PlanPage() {
   if (!plan) {
     return (
       <>
-        <div className="page-head"><h1>Your shopping plan.</h1></div>
+        <PageIntro
+          eyebrow="Step 3 of 3"
+          title="Your shopping list."
+          lead="Once a complete plan exists, this becomes a checklist grouped by store that you can tick off while you shop."
+        />
         <EmptyState title="There is no complete plan to hand you yet.">
           <p className="small">{comparison.decision.detail}</p>
           <Link className="btn primary" to="/basket">Back to the basket</Link>
@@ -63,13 +67,16 @@ export default function PlanPage() {
 
   return (
     <>
-      <div className="page-head">
-        <h1>Your shopping plan.</h1>
-        <p className="sub">
-          A shopping plan grouped by store, not an optimized driving route. A stop order would need travel data
-          CartNomic does not have.
-        </p>
-      </div>
+      <PageIntro
+        eyebrow="Step 3 of 3"
+        title="Your shopping list."
+        lead="Everything grouped by store, with what each one costs. Tick items off as you go. It survives a refresh, prints, and copies as plain text."
+        points={[
+          { icon: ListTodo, title: 'Tick as you shop', text: 'Checkmarks save to this device, so closing the tab does not lose your place.' },
+          { icon: Printer, title: 'Print or copy', text: 'A print view and a copy as text button, so it still works with no signal in the store.' },
+          { icon: MapPin, title: 'Not a driving route', text: 'A list grouped by store. CartNomic has no travel data, so it will not pretend to optimize a route.' },
+        ]}
+      />
 
       {dataMode === 'demo' ? (
         <Banner tone="demo">

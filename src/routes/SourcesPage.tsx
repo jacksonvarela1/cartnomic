@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { Download, Trash2, Upload } from 'lucide-react'
+import { BadgeCheck, Download, FlaskConical, PenLine, Trash2, Upload } from 'lucide-react'
 import { useApp } from '../state/store'
 import cpiJson from '../data/bls_cpi_monthly.json'
 import { coverageStats, type CpiSnapshot } from '../domain/cpi'
 import { evidenceLibrary, usdaLimitations, usdaQuery, usdaRetrievedOn, DEMO_WARNING } from '../domain/catalog'
 import { previewObservations, previewProducts, previewStores, toCsv, type ImportPreview } from '../domain/importer'
-import { Banner, downloadText } from '../components/ui'
+import { Banner, PageIntro, downloadText } from '../components/ui'
 import type { PriceObservation, Product, Store } from '../domain/types'
 
 const snapshot = cpiJson as unknown as CpiSnapshot
@@ -52,13 +52,16 @@ export default function SourcesPage() {
 
   return (
     <>
-      <div className="page-head">
-        <h1>Sources and data</h1>
-        <p className="sub">
-          Public data, your own observations and fictional test data are kept apart here and in the code. Nothing is
-          promoted from one category to another.
-        </p>
-      </div>
+      <PageIntro
+        eyebrow="Transparency"
+        title="Where every number comes from."
+        lead="Three kinds of data live in this app and they are kept strictly apart: official public data, prices you recorded yourself, and made up test data. Nothing is ever promoted from one category to another."
+        points={[
+          { icon: BadgeCheck, title: 'Public data', text: 'Government and manufacturer sources, with links and the date each one was retrieved.' },
+          { icon: PenLine, title: 'Your own records', text: 'Anything you import, labeled unreviewed until a person actually checks it.' },
+          { icon: FlaskConical, title: 'Test data', text: 'The fictional sample stores, labeled everywhere they appear, including exports.' },
+        ]}
+      />
 
       <div className="card">
         <div className="card-head">
@@ -128,9 +131,10 @@ export default function SourcesPage() {
           <h2>Import your own observations</h2>
           <span className="pill neutral">User observation</span>
         </div>
-        <p className="small muted">
-          An uploaded file is your own record until a person reviews it. CartNomic never marks an import as
-          independently verified, and imported text is always displayed as text.
+        <p className="section-note">
+          <strong>Collect five real prices at two stores and this stops being a demo.</strong> Import stores first,
+          then products, then prices. Every upload gets a preview with row by row errors before anything is saved,
+          and nothing you upload is ever marked as independently verified.
         </p>
 
         <div className="grid cols-3">

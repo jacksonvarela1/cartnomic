@@ -9,7 +9,8 @@ import {
   type CpiSnapshot,
 } from '../domain/cpi'
 import { formatCents } from '../domain/money'
-import { EmptyState, Banner } from '../components/ui'
+import { EmptyState, Banner, InfoTip, PageIntro } from '../components/ui'
+import { Landmark, PackageSearch, Store } from 'lucide-react'
 
 const snapshot = cpiJson as unknown as CpiSnapshot
 const views = buildSeriesViews(snapshot)
@@ -66,13 +67,16 @@ export default function TrendsPage() {
 
   return (
     <>
-      <div className="page-head">
-        <h1>Price trends</h1>
-        <p className="sub">
-          Three separate sources, never mixed: national public inflation data, your own dated store observations, and
-          your own fixed basket.
-        </p>
-      </div>
+      <PageIntro
+        eyebrow="Context"
+        title="What is actually happening to grocery prices?"
+        lead="Real published data from the U.S. Bureau of Labor Statistics, plus any prices you have recorded yourself. The three tabs below are three different things, and CartNomic never mixes them."
+        points={[
+          { icon: Landmark, title: 'National food prices', text: 'Official government inflation data, recalculated here from the raw published numbers.' },
+          { icon: Store, title: 'Observed store prices', text: 'Only prices you recorded yourself, at one store, for one exact product.' },
+          { icon: PackageSearch, title: 'My fixed basket', text: 'What your own basket would have cost on different dates, with the list held still.' },
+        ]}
+      />
 
       <div className="tabs" role="tablist" aria-label="Trend sources">
         <button role="tab" aria-selected={tab === 'national'} onClick={() => setTab('national')}>National food prices</button>
@@ -87,11 +91,19 @@ export default function TrendsPage() {
               <h2>{view.meta.label} index</h2>
               <span className="pill good">Real public data</span>
             </div>
-            <p className="small muted">
-              U.S. city average, CPI-U, not seasonally adjusted. Data through {periodLabel(latest)}. Units:{' '}
-              {view.meta.unit}. An index measures change over time. It is not the dollar price of a basket, and it is
-              not any retailer's markup.
-            </p>
+            <div className="section-note">
+              <strong>How to read this.</strong> An index is not a dollar price. It tracks how far prices have moved
+              from a base period, so a line going from 305 to 321 means prices rose about five percent over that
+              stretch, not that anything costs $321. It is a national average, so it is not any one store setting its
+              own prices.
+              <InfoTip term="CPI-U, not seasonally adjusted">
+                CPI-U is the index covering all urban consumers, the standard headline measure. Not seasonally
+                adjusted means these are the raw monthly numbers, without smoothing out predictable seasonal swings.
+              </InfoTip>
+              <span className="caption" style={{ display: 'block', marginTop: 6 }}>
+                U.S. city average, CPI-U, not seasonally adjusted. Data runs through {periodLabel(latest)}.
+              </span>
+            </div>
 
             <div className="grid cols-3">
               <div className="field">
@@ -231,9 +243,10 @@ export default function TrendsPage() {
             <h2>Observed store prices</h2>
             <span className="pill neutral">{dataMode === 'demo' ? 'Demo mode' : 'Your observations'}</span>
           </div>
-          <p className="small muted">
-            A retailer price history needs repeated dated observations of the same product, at the same location, in
-            the same channel, with a comparable package. Two observations show two observations, not a live trend.
+          <p className="section-note">
+            <strong>This tab stays empty until you collect data.</strong> A price history needs the same exact
+            product, at the same store, recorded on at least two different dates. CartNomic will not stitch together
+            different package sizes or locations, and it will never use national inflation to invent a store history.
           </p>
           <div className="grid cols-2">
             <div className="field">
@@ -286,9 +299,10 @@ export default function TrendsPage() {
       {tab === 'basket' ? (
         <div className="card">
           <h2>My fixed basket</h2>
-          <p className="small muted">
-            A fixed basket freezes the products, the quantities and the pricing method. Changing the list creates a new
-            basket version. More spending on more food is not inflation.
+          <p className="section-note">
+            <strong>Same list, different dates.</strong> To compare what your basket cost over time, the list has to
+            stay still. Adding an item or changing a quantity starts a new basket version, because spending more on
+            more food is not the same thing as prices going up.
           </p>
           {lines.length === 0 ? (
             <EmptyState title="No basket yet." />
