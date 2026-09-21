@@ -1,7 +1,7 @@
 // Deterministic, versioned shopping rules. Every verdict carries evidence, a rule version and the
 // fields it could not resolve. Nothing here is medical advice or an allergy safety certification.
 
-export const RULE_VERSION = 'cartnomic-diet-rules-2026-09-21.1'
+export const RULE_VERSION = 'cartnomic-diet-rules-2026-09-21.2'
 
 export type DietStatus = 'match' | 'does_not_match' | 'unknown'
 
@@ -156,6 +156,12 @@ interface GroupRule {
   exempt: RegExp[]
 }
 
+
+// Plant analogues of dairy products. These are named after dairy but are not dairy, and they are not
+// animal foods either, so both the dairy rules and the carnivore rule need to know about them.
+const PLANT_DAIRY_ANALOGUE =
+  /\b(coconut|almond|soy|soya|oat|rice|cashew|hemp|pea|flax|macadamia|walnut|hazelnut|sunflower|sesame)\s+(milk|cream|creamer|butter|yogurt|yoghurt|cheese)\b/
+
 const GROUP_RULES: Record<IngredientGroup, GroupRule> = {
   meat: {
     positive: [/\bbeef\b/, /\bpork\b/, /\bchicken\b/, /\bturkey\b/, /\blamb\b/, /\bveal\b/, /\bbacon\b/, /\bham\b/, /\bduck\b/, /\bbison\b/, /\bvenison\b/, /\bgoat meat\b/, /\btallow\b/, /\blard\b/, /\bmeat\b/, /\bpoultry\b/, /\bcollagen\b/, /\bbone broth\b/],
@@ -166,8 +172,9 @@ const GROUP_RULES: Record<IngredientGroup, GroupRule> = {
     exempt: [],
   },
   dairy: {
-    positive: [/\bmilk\b/, /\bcream\b/, /\bbutter\b/, /\bcheese\b/, /\bwhey\b/, /\bcasein/, /\blactose\b/, /\bghee\b/, /\byogurt\b/, /\bmilkfat\b/, /\bbutterfat\b/, /\bdairy\b/],
-    exempt: [/\b(coconut|almond|soy|soya|oat|rice|cashew|hemp|pea|flax|macadamia|walnut|hazelnut)\s+milk\b/, /\bcocoa butter\b/, /\b(peanut|almond|cashew|sunflower|shea|apple|seed|nut)\s+butter\b/, /\bmilk thistle\b/, /\bnon[- ]?dairy\b/, /\bdairy[- ]free\b/],
+    // buttermilk, milkfat and milk solids are compound words, so a bare \bmilk\b never matches them.
+    positive: [/\bmilk\b/, /\bcream\b/, /\bcreamer\b/, /\bbutter\b/, /\bcheese\b/, /\bwhey\b/, /\bcasein/, /\blactose\b/, /\bghee\b/, /\byogurt\b/, /\byoghurt\b/, /\bkefir\b/, /buttermilk/, /\bmilkfat\b/, /\bbutterfat\b/, /\bmilk\s?solids\b/, /\bdairy\b/],
+    exempt: [PLANT_DAIRY_ANALOGUE, /\bcocoa butter\b/, /\b(peanut|almond|cashew|sunflower|shea|apple|seed|nut)\s+butter\b/, /\bmilk thistle\b/, /\bnon[- ]?dairy\b/, /\bdairy[- ]free\b/, /\bcoconut (meat|oil|water)\b/],
   },
   egg: { positive: [/\begg\b/, /\beggs\b/, /\balbumen\b/, /\bovalbumin\b/], exempt: [/\begg substitute\b/] },
   gelatin: { positive: [/\bgelatin\b/], exempt: [/\bvegetable gelatin\b/, /\bagar\b/] },
@@ -206,6 +213,7 @@ const AMBIGUOUS: Array<{ re: RegExp; affects: IngredientGroup[]; note: string }>
 // Ingredients that are recognizably not animal foods. Used by the carnivore rule set, which needs
 // positive identification rather than an assumption about anything it does not recognize.
 const KNOWN_NON_ANIMAL = [
+  PLANT_DAIRY_ANALOGUE,
   /\bcaramel color\b/, /\baspartame\b/, /\bphosphoric acid\b/, /\bpotassium benzoate\b/, /\bcitric acid\b/,
   /\bcaffeine\b/, /\bsugar\b/, /\bcorn\b/, /\bwheat\b/, /\brice\b/, /\boats?\b/, /\bsoy\b/, /\bpotato\b/,
   /\bcellulose\b/, /\bannatto\b/, /\bnatamycin\b/, /\bstarch\b/, /\bolive oil\b/, /\bvegetable oil\b/,
@@ -246,6 +254,9 @@ export function readGroup(ingredientsText: string | null, group: IngredientGroup
     return { presence: 'unresolved', matchedPhrases: [], unresolvedNotes: ['No ingredient list is recorded for this product.'] }
   }
   const phrases = splitIngredients(ingredientsText)
+  if (phrases.length === 0) {
+    return { presence: 'unresolved', matchedPhrases: [], unresolvedNotes: ['The recorded ingredient text could not be read as a list of ingredients.'] }
+  }
   const rule = GROUP_RULES[group]
   const matched = phrases.filter((p) => phraseMatchesGroup(p, rule))
   if (matched.length > 0) return { presence: 'present', matchedPhrases: matched, unresolvedNotes: [] }
@@ -265,10 +276,17 @@ export function readCarnivore(ingredientsText: string | null, options: Carnivore
     return { presence: 'unresolved', matchedPhrases: [], unresolvedNotes: ['No ingredient list is recorded for this product.'] }
   }
   const phrases = splitIngredients(ingredientsText)
+  if (phrases.length === 0) {
+    return { presence: 'unresolved', matchedPhrases: [], unresolvedNotes: ['The recorded ingredient text could not be read as a list of ingredients.'] }
+  }
   const offending: string[] = []
   const notes: string[] = []
   for (const phrase of phrases) {
-    if (ANIMAL_FOODS.some((re) => re.test(phrase))) continue
+    // A plant analogue is named after a dairy food, so strip it before testing for animal foods.
+    // Without this, "coconut milk" would match /\bmilk\b/ and be read as an animal food.
+    const stripped = phrase.replace(PLANT_DAIRY_ANALOGUE, ' ')
+    if (stripped !== phrase) { offending.push(phrase); continue }
+    if (ANIMAL_FOODS.some((re) => re.test(stripped))) continue
     if (CARNIVORE_NEUTRAL.some((re) => re.test(phrase))) continue
     if (options.allowPlantSeasonings && /\b(pepper|spice|herb|garlic|onion|paprika)\b/.test(phrase)) continue
     if (KNOWN_NON_ANIMAL.some((re) => re.test(phrase))) { offending.push(phrase); continue }
@@ -371,19 +389,22 @@ export function evaluateNutritionTarget(
 
   let value = raw
   let basisNote = ''
+  const grams = evidence.servingGrams
+  const gramsUsable = grams !== null && Number.isFinite(grams) && grams > 0
   if (evidence.basis !== target.basis) {
     if (evidence.basis === 'per_100g' && target.basis === 'per_serving') {
-      if (evidence.servingGrams === null) {
-        return { ruleId: target.id, ruleLabel: label, status: 'unknown', reason: 'Source values are per 100 g and the serving mass in grams is not recorded, so a per serving comparison is not possible.', evidenceRefs: [evidence.recordId], unresolvedFields: ['serving mass in grams'] }
+      if (!gramsUsable) {
+        return { ruleId: target.id, ruleLabel: label, status: 'unknown', reason: 'Source values are per 100 g and a usable serving mass in grams is not recorded, so a per serving comparison is not possible.', evidenceRefs: [evidence.recordId], unresolvedFields: ['serving mass in grams'] }
       }
-      value = (raw * evidence.servingGrams) / 100
-      basisNote = ' Converted from per 100 g using the recorded ' + evidence.servingGrams + ' g serving.'
+      value = (raw * (grams as number)) / 100
+      basisNote = ' Converted from per 100 g using the recorded ' + grams + ' g serving.'
     } else if (evidence.basis === 'per_serving' && target.basis === 'per_100g') {
-      if (evidence.servingGrams === null) {
-        return { ruleId: target.id, ruleLabel: label, status: 'unknown', reason: 'Source values are per labeled serving and the serving mass in grams is not recorded, so a per 100 g comparison is not possible. A liquid volume serving is not an equal mass in grams.', evidenceRefs: [evidence.recordId], unresolvedFields: ['serving mass in grams'] }
+      // A zero or missing serving mass would divide to Infinity and force a false positive match.
+      if (!gramsUsable) {
+        return { ruleId: target.id, ruleLabel: label, status: 'unknown', reason: 'Source values are per labeled serving and a usable serving mass in grams is not recorded, so a per 100 g comparison is not possible. A liquid volume serving is not an equal mass in grams.', evidenceRefs: [evidence.recordId], unresolvedFields: ['serving mass in grams'] }
       }
-      value = (raw * 100) / evidence.servingGrams
-      basisNote = ' Converted from the recorded ' + evidence.servingGrams + ' g serving.'
+      value = (raw * 100) / (grams as number)
+      basisNote = ' Converted from the recorded ' + grams + ' g serving.'
     }
   }
 
@@ -507,6 +528,10 @@ export function assessProduct(
     const escaped = term.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     const re = new RegExp('\\b' + escaped + '\\b')
     const phrases = splitIngredients(ing)
+    if (phrases.length === 0) {
+      rules.push({ ruleId, ruleLabel: 'Exclude ' + term, status: 'unknown', reason: 'The recorded ingredient text could not be read as a list of ingredients.', evidenceRefs: evidence ? [evidence.recordId] : [], unresolvedFields: ['ingredient list'] })
+      continue
+    }
     const hit = phrases.filter((p) => re.test(p))
     if (hit.length > 0) {
       rules.push({ ruleId, ruleLabel: 'Exclude ' + term, status: 'does_not_match', reason: 'Ingredient list contains: ' + hit.join('; ') + '.', evidenceRefs: evidence ? [evidence.recordId] : [], unresolvedFields: [] })

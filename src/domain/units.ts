@@ -84,7 +84,9 @@ export function packagesRequired(
   }
   const converted = convertAmount(packageAmount, packageUnit, requiredUnit)
   if (converted.value === null) return { ...base, error: converted.error }
-  const packages = Math.ceil(requiredAmount / converted.value - 1e-9)
+  // The epsilon absorbs float overshoot, but it must never round a real requirement down to zero
+  // packages, so any positive requirement buys at least one package.
+  const packages = Math.max(1, Math.ceil(requiredAmount / converted.value - 1e-9))
   const overbuy = packages * converted.value - requiredAmount
   return {
     packages,
