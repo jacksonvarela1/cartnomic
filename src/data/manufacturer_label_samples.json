@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "status": "selected_fields_transcribed_from_official_manufacturer_pages",
+  "records": [
+    {
+      "label_id": "diet_coke_us_12_fl_oz",
+      "product_name": "Diet Coke, original, U.S. 12 fl oz can",
+      "brand": "Coca-Cola",
+      "source_kind": "manufacturer_web_label",
+      "source_url": "https://www.coca-cola.com/us/en/brands/diet-coke/products",
+      "retrieved_on": "2026-09-21",
+      "nutrition_basis": "per 12 U.S. fl oz can",
+      "serving_size": 12,
+      "serving_unit": "US_fl_oz",
+      "serving_grams": null,
+      "nutrition": {
+        "energy_kcal": 0,
+        "protein_g": 0,
+        "fat_g": 0,
+        "carbohydrate_g": 0,
+        "total_sugars_g": 0,
+        "added_sugars_g": 0,
+        "sodium_mg": 40,
+        "caffeine_mg": 46
+      },
+      "ingredients": "CARBONATED WATER, CARAMEL COLOR, ASPARTAME, PHOSPHORIC ACID, POTASSIUM BENZOATE (TO PROTECT TASTE), NATURAL FLAVORS, CITRIC ACID, CAFFEINE.",
+      "gtin_upc": null,
+      "package_count": null,
+      "allergen_free_status": "unknown",
+      "note": "Nutrient label for a can; no verified 12-pack UPC or local price. Natural flavor sources are not specified."
+    },
+    {
+      "label_id": "oikos_triple_zero_plain_32oz_us",
+      "product_name": "Oikos Triple Zero Plain nonfat Greek yogurt, 32 oz quart",
+      "brand": "Oikos",
+      "source_kind": "manufacturer_web_label",
+      "source_url": "https://www.oikos.com/all-products/triple-zero/product/plain-quart/",
+      "retrieved_on": "2026-09-21",
+      "nutrition_basis": "per 170 g serving",
+      "serving_size": 170,
+      "serving_unit": "g",
+      "serving_grams": 170,
+      "nutrition": {
+        "energy_kcal": 100,
+        "protein_g": 18,
+        "fat_g": 0,
+        "carbohydrate_g": 7,
+        "total_sugars_g": 7,
+        "added_sugars_g": 0,
+        "sodium_mg": 60
+      },
+      "ingredients": "CULTURED NON FAT MILK. YOGURT CULTURES: S. THERMOPHILUS & L. BULGARICUS.",
+      "gtin_upc": null,
+      "package_size_text": "32 oz quart",
+      "manufacturer_claims": [
+        "Certified Gluten Free"
+      ],
+      "contains_evidence": [
+        "milk"
+      ],
+      "allergen_free_status": "not_allergen_free",
+      "note": "Contains dairy. The manufacturer page carries a gluten-free certification badge. No verified local shelf price or UPC."
+    }
+  ]
+}

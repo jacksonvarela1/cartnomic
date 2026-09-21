@@ -1,0 +1,84 @@
+{
+  "status": "real_public_data",
+  "period": "2026-08",
+  "source_url": "https://www.bls.gov/news.release/cpi.t01.htm",
+  "observations": [
+    {
+      "series_id": "CUUR0000SAF11",
+      "category": "Food at home",
+      "period": "2026-08",
+      "index_value": 321.5,
+      "prior_year_index": 314.608,
+      "yoy_pct_calculated": 2.190663,
+      "yoy_pct_bls_published": 2.2,
+      "source_url": "https://www.bls.gov/news.release/cpi.t01.htm",
+      "retrieved_on": "2026-09-21"
+    },
+    {
+      "series_id": "CUUR0000SAF111",
+      "category": "Cereals and bakery products",
+      "period": "2026-08",
+      "index_value": 369.171,
+      "prior_year_index": 359.74,
+      "yoy_pct_calculated": 2.621616,
+      "yoy_pct_bls_published": 2.6,
+      "source_url": "https://www.bls.gov/news.release/cpi.t01.htm",
+      "retrieved_on": "2026-09-21"
+    },
+    {
+      "series_id": "CUUR0000SAF112",
+      "category": "Meats, poultry, fish, and eggs",
+      "period": "2026-08",
+      "index_value": 351.501,
+      "prior_year_index": 347.509,
+      "yoy_pct_calculated": 1.148747,
+      "yoy_pct_bls_published": 1.1,
+      "source_url": "https://www.bls.gov/news.release/cpi.t01.htm",
+      "retrieved_on": "2026-09-21"
+    },
+    {
+      "series_id": "CUUR0000SEFJ",
+      "category": "Dairy and related products",
+      "period": "2026-08",
+      "index_value": 272.068,
+      "prior_year_index": 272.84,
+      "yoy_pct_calculated": -0.28295,
+      "yoy_pct_bls_published": -0.3,
+      "source_url": "https://www.bls.gov/news.release/cpi.t01.htm",
+      "retrieved_on": "2026-09-21"
+    },
+    {
+      "series_id": "CUUR0000SAF113",
+      "category": "Fruits and vegetables",
+      "period": "2026-08",
+      "index_value": 367.507,
+      "prior_year_index": 356.104,
+      "yoy_pct_calculated": 3.202154,
+      "yoy_pct_bls_published": 3.2,
+      "source_url": "https://www.bls.gov/news.release/cpi.t01.htm",
+      "retrieved_on": "2026-09-21"
+    },
+    {
+      "series_id": "CUUR0000SAF114",
+      "category": "Nonalcoholic beverages and beverage materials",
+      "period": "2026-08",
+      "index_value": 237.834,
+      "prior_year_index": 229.406,
+      "yoy_pct_calculated": 3.673836,
+      "yoy_pct_bls_published": 3.7,
+      "source_url": "https://www.bls.gov/news.release/cpi.t01.htm",
+      "retrieved_on": "2026-09-21"
+    },
+    {
+      "series_id": "CUUR0000SAF115",
+      "category": "Other food at home",
+      "period": "2026-08",
+      "index_value": 283.37,
+      "prior_year_index": 276.649,
+      "yoy_pct_calculated": 2.429432,
+      "yoy_pct_bls_published": 2.4,
+      "source_url": "https://www.bls.gov/news.release/cpi.t01.htm",
+      "retrieved_on": "2026-09-21"
+    }
+  ]
+}
